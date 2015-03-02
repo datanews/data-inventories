@@ -1,0 +1,6 @@
+{
+  "epa": "http://epa.gov/data.json",
+  "opm": "http://opm.gov/data.json",
+  "va": "http://va.gov/data.json",
+  "dol": "http://dol.gov/data.json"
+}
