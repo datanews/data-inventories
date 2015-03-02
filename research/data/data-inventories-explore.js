@@ -61,14 +61,16 @@ dlQueue.awaitAll(function(error, results) {
     data = data.concat(u.data.dataset);
   });
 
-  // Make sure there are no empty rows
+  // Make sure there are no empty rows or weird data.  There are some
+  // data with "-" for values, though a valid description
   data = _.filter(data, function(d, di) {
-    return _.isObject(d);
+    return _.isObject(d) && d.accessLevel !== '-';
   });
 
   // There are some duplicates.  We use the publisher name and identifier to
   // determine if the same dataset.  It looks like the identifier is unique
-  // but it doesn't technically need to be unique across agencies
+  // but it doesn't technically need to be unique across agencies.
+  // For instance, the identifier "1" is used twice
   ids = {};
   _.each(data, function(d, di) {
     ids[d.identifier + d.publisher.name] = d;
@@ -77,6 +79,10 @@ dlQueue.awaitAll(function(error, results) {
 
   // Some stats
   // Description of schema: https://project-open-data.cio.gov/schema/
+
+  // Count
+  console.log('Files (could be duplicate) count: ', urls.length);
+  console.log('============= \n');
 
   // Count
   console.log('Dataset count: ', data.length);
@@ -128,6 +134,7 @@ dlQueue.awaitAll(function(error, results) {
   console.log('============= \n');
 
   // Identifier count
+  /*
   console.log('Identifier >2 name count: ')
   _.each(_.groupBy(data, function(d, di) {
     return d.identifier;
@@ -137,5 +144,12 @@ dlQueue.awaitAll(function(error, results) {
     }
   });
   console.log('============= \n');
+  */
 
+  // Some data checking
+  _.each(data, function(d, di) {
+    if (!d.title) {
+      console.log(d);
+    }
+  });
 });
