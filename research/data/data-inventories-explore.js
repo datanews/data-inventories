@@ -76,6 +76,7 @@ console.log('License count: ', _.map(_.groupBy(data, 'license'), function(d, di)
 console.log('============= \n');
 
 // Period
+// https://project-open-data.cio.gov/iso8601_guidance/#accrualperiodicity
 console.log('Periodicity count: ', _.map(_.groupBy(data, 'accrualPeriodicity'), function(d, di) {
   return di + ': '  + d.length;
 }));
