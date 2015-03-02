@@ -5,11 +5,15 @@ var path = require('path');
 var request = require('request');
 var _ = require('lodash');
 var queue = require('queue-async');
+var moment = require('moment');
 
 // Some variables
 var data = [];
 var dlQueue = queue(4);
-var ids;
+var ids, output;
+
+// Output path
+var outputPath = path.join(__dirname, '../../src/data/data-inventories.json');
 
 // List of inventories
 var urls = require(path.join(__dirname, '../scraper/with-data.json'));
@@ -76,6 +80,23 @@ dlQueue.awaitAll(function(error, results) {
     ids[d.identifier + d.publisher.name] = d;
   });
   data = _.values(ids);
+
+  // Create output for project
+  console.log('Saving processed file ... \n')
+  output = _.map(_.filter(data, function(d, di) {
+    return d.accessLevel !== 'public';
+  }), function(d, di) {
+    // Make smaller for output
+    return [
+      d.title,
+      d.description,
+      d.publisher.name,
+      d.accessLevel,
+      d.license,
+      d.accrualPeriodicity
+    ];
+  });
+  fs.writeFileSync(outputPath, JSON.stringify({ o: moment().format('YYYY-MM-DD'), d: output }));
 
   // Some stats
   // Description of schema: https://project-open-data.cio.gov/schema/
