@@ -105,7 +105,8 @@ gulp.task("watch",["js","css","misc","html"],function() {
 
 });
 
-// Web server with livereload
+// Web server.  With optional livereload, browser extensions
+// http://feedback.livereload.com/knowledgebase/articles/86242-how-do-i-install-and-use-the-browser-extensions-
 gulp.task("server", function() {
 
   // Don't require this by default since it's not a core dependency

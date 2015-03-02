@@ -27,6 +27,8 @@
   },
   "devDependencies": {
     "connect-livereload": "^0.5.3",
-    "express": "^4.11.2"
+    "express": "^4.11.2",
+    "lodash": "^3.3.1",
+    "request": "^2.53.0"
   }
 }

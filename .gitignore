@@ -1,6 +1,7 @@
 # WNYC project ignores
 live_files/*
 output/*
+research/data/original/*
 
 # General git ignores
 node_modules/
