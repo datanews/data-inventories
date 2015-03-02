@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+
+    <!-- Chartbeat Time Capture -->
+    <script src="http://project.wnyc.org/assets/js/chartbeat.head.js"></script>
+    <title><%=template.Title%> | WNYC</title>
+
+    <meta name="author" content="WNYC Data News" />
+    <meta name="description" content="<%=(template["Social Description"] || "").replace(/"/g, "&quot;")%>" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- For proper phone zoom -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Gotham font -->
+    <% if (template.DEPLOY) { %>
+      <link rel="stylesheet" href="//cloud.typography.com/7065472/656142/css/fonts.css" type="text/css">
+    <% } else { %>
+      <link rel="stylesheet" href="//media.wnyc.org/static/gotham/176205/1D6F0D9D0E2D9044E.css" type="text/css">
+    <% } %>
+
+    <!-- Base Data News/WNYC styles -->
+    <link rel="stylesheet" href="css/base.css" type="text/css" />
+
+    <!-- Font Awesome -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <!-- Project-specific styles-->
+    <link rel="stylesheet" href="css/project.css" type="text/css" />
+
+    <!-- Project-specific mobile styles -->
+    <link rel="stylesheet" href="css/project.mobile.css" type="text/css" />
+
+    <% if (template["Use Full Footer"]) { %>
+      <link rel="stylesheet" href="css/wnyc-footer.css" type="text/css" />
+    <% } %>
+
+    <!-- Social Media Tags -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="<%=template.URL%>" />
+    <meta property="og:title" content="<%=(template.Title || "").replace(/"/g, "&quot;")%>" />
+    <meta property="og:description" content="<%=(template["Social Description"] || "").replace(/"/g, "&quot;")%>" />
+    <meta property="og:image" content="<%=template.URL%><%=template["Social Image"]%>" />
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@datanews">
+    <meta name="twitter:title" content="<%=(template.Title || "").replace(/"/g, "&quot;")%>">
+    <meta name="twitter:description" content="<%=(template["Social Description"] || "").replace(/"/g, "&quot;")%>">
+    <meta name="twitter:image" content="<%=template.URL%><%=template["Social Image"]%>">
+    <!-- End Social Media Tags -->
+
+    <!-- Google Analytics --> 
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-283599-23']);
+
+
+      <% if (template["Data News Tuesday"]) { %>
+        _gaq.push(['_setCustomVar',5,'DataTues','True',3]);
+      <% } %>
+
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
+    <!-- End Google Analytics -->
+
+  </head>
+  <body>
+
+    <div id="header">
+
+      <div id="header-top">
+        <a id="header-logo" href="http://www.wnyc.org" target="_blank"><div class="table"><div class="cell"></div></div></a>
+        <div id="header-title" class="table"><div class="cell"><%=template.Title%></div></div>
+        <a id="header-toggle" class="header-button" href="#" title="Menu"><div class="table"><div class="cell"><i class="fa fa-reorder"></i></div></div></a>
+        <a id="header-fb" class="header-button" title="Share on Facebook" class="share-action facebook" href="https://www.facebook.com/sharer/sharer.php?u=<%=template.URL%>" target="_blank"><div class="table"><div class="cell"><i class="fa fa-facebook"></i></div></div></a> 
+        <a id="header-twitter" class="header-button" title="Tweet" class="share-action twitter" href="https://twitter.com/share?url=<%=template["Tweet URL"]%>&text=<% print(encodeURIComponent(template["Tweet"] || "")); %>&via=WNYC" target="_blank"><div class="table"><div class="cell"><i class="fa fa-twitter"></i></div></div></a>
+      </div>
+
+      <% if (template.Introduction) { %>
+        <div id="header-bottom"><div class="header-intro"><%=template.Introduction%></div></div>
+      <% } %>
+
+      <div id="old-browser-warning"><p>This may not work properly for you. Consider <a href="http://whatbrowser.org/">upgrading</a> to a newer browser.</p></div>
+
+    </div>
+

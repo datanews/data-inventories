@@ -1,0 +1,17 @@
+{
+  "camelcase": true,
+  "curly": true,
+  "freeze": true,
+  "indent": 2,
+  "latedef": false,
+  "nonbsp": true,
+  "trailing": true,
+  "nonew": true,
+  "quotmark": "double",
+  "undef": true,
+  "unused": false,
+  "eqnull": true,
+  "browser": true,
+  "devel": true,
+  "node": true
+}
