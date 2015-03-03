@@ -1,7 +1,7 @@
 {
-  "name": "ui-template",
+  "name": "federal-data-inventory",
   "version": "0.1.0",
-  "description": "Bootstrapper for project.wnyc.org projects.",
+  "description": "Get data.json files for all .gov sites.",
   "main": "gulpfile.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -10,27 +10,15 @@
     "type": "git",
     "url": "git@git.wnyc.net:datanews/ui-template"
   },
-  "author": "Noah Veltman, John Keefe, Louise Ma, Jenny Ye, Kio Stark",
+  "author": "Noah Veltman, John Keefe, Louise Ma, Jenny Ye, Kio Stark, Alan Palazzolo",
   "license": "MIT",
   "dependencies": {
-    "gulp": "^3.8.8",
-    "gulp-changed": "^1.0.0",
-    "gulp-cssbeautify": "^0.1.3",
-    "gulp-express": "^0.1.9",
-    "gulp-imagemin": "^1.1.0",
-    "gulp-jshint": "^1.8.5",
-    "gulp-less": "^1.3.6",
-    "gulp-template": "^1.1.0",
-    "gulp-wrapper": "^0.1.5",
-    "markdowneyjr": "^3.0.1",
-    "template": "^0.2.1"
-  },
-  "devDependencies": {
-    "connect-livereload": "^0.5.3",
-    "express": "^4.11.2",
+    "dsv": "0.0.4",
     "lodash": "^3.3.1",
+    "mkdirp": "^0.5.0",
     "moment": "^2.9.0",
     "queue-async": "^1.0.7",
     "request": "^2.53.0"
-  }
+  },
+  "devDependencies": {}
 }
