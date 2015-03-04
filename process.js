@@ -24,12 +24,12 @@ var dotgovURL = 'https://gsa.github.io/data/dotgov-domains/2014-12-01-full.csv';
 var dotgovCSV = path.join(__dirname, 'data/dotgov.csv');
 var urlsJSON = path.join(__dirname, 'data/data-inventories.json');
 var combineDataJSON = path.join(__dirname, 'data/data-inventory.json');
+var combineDataCSV = path.join(__dirname, 'data/data-inventory.csv');
 
 
 // Ensure we have directories
 mkdirp.sync(path.join(__dirname, 'data'));
 mkdirp.sync(path.join(__dirname, 'data/json'));
-mkdirp.sync(path.join(__dirname, 'data/csv'));
 
 
 // Get CSV of dotgov if needed
@@ -117,12 +117,13 @@ function getDataInventories() {
         console.log('Downloading ' + u['Data URL'] + ' ... ');
 
         request.get({ url: u['Data URL'], timeout: requestTimeout }, function(error, response, body) {
-          if (!error && response.statusCode === 200) {
+          if (!error && response.statusCode === 200 && body.length > 20) {
             fs.writeFileSync(localPath, body);
             done();
           }
           else {
             console.error('Error getting JSON file.', error, u);
+            done();
           }
         });
       });
@@ -140,15 +141,15 @@ function getDataInventories() {
 }
 
 
-// Combine all data
+// Combine all data.
 function combineData() {
   var urls = require(urlsJSON);
   var data = [];
   var ids, output;
+  var combinedCSV = [ ['agency', 'publisher', 'title', 'description', 'access'] ];
 
-  if (fs.existsSync(combineDataJSON) && !update) {
-    console.log('Combined file already created.');
-    createCSV();
+  if (fs.existsSync(combineDataJSON) && fs.existsSync(combineDataCSV) && !update) {
+    console.log('Combined files already created.');
     return;
   }
 
@@ -156,14 +157,29 @@ function combineData() {
 
   // Load files together
   urls = _.map(urls, function(u, ui) {
-    var localPath = path.join(__dirname, 'data/json/', r.id + '.data.json');
-    u.data = require(localPath);
+    var localPath = path.join(__dirname, 'data/json/', u.id + '.data.json');
+    if (fs.existsSync(localPath)) {
+      u.data = require(localPath);
+    }
+    return u;
+  });
+
+  // Add agency name
+  urls = _.map(urls, function(u, ui) {
+    if (u.data && u.data.dataset) {
+      u.data.dataset = _.map(u.data.dataset, function(d, di) {
+        d.agency = u['Agency'];
+        return d;
+      });
+    }
     return u;
   });
 
   // Concatenate datasets for easier stats
   _.each(urls, function(u, ui) {
-    data = data.concat(u.data.dataset);
+    if (u.data && u.data.dataset) {
+      data = data.concat(u.data.dataset);
+    }
   });
 
   // Make sure there are no empty rows or weird data.  There are some
@@ -182,36 +198,24 @@ function combineData() {
   });
   data = _.values(ids);
 
-  // Create output for project
+  // Create JSON output for project
   fs.writeFileSync(combineDataJSON, JSON.stringify(data));
-  console.log('Combine data file saved. ');
 
-  createCSV();
-}
-
-
-// Create CSVs
-function createCSV() {
-  var urls = require(urlsJSON);
-
-  _.each(urls, function(u, ui) {
-    var data = require(u.path);
-    var localPath = path.join(__dirname, 'data/csv/', u.id + '.data.csv');
-    var output = ['agency', 'publisher', 'title', 'description'];
-
-    // Add datasets
-    _.each(data, function(d, di) {
-      output.push([
-        u['Federal Agency'],
-        d.publisher.name,
-        d.title,
-        d.description
-      ]);
-    });
-
-    // Output to file
-    fs.writeFileSync(path, csv.format(output));
+  // Create CSV output
+  _.each(data, function(d, di) {
+    var row = [
+      d.agency,
+      d.publisher.name,
+      d.title,
+      d.description,
+      d.accessLevel
+    ];
+    combinedCSV.push(row);
   });
+  fs.writeFileSync(combineDataCSV, csv.format(combinedCSV));
+
+  // Create
+  console.log('Combine data files saved. ');
 }
 
 
@@ -224,7 +228,6 @@ function checkDataURL(row, www, cb) {
 
   // Get the URL
   request.get({ url: url, timeout: requestTimeout }, function(err, res, body) {
-
     var found = false;
 
     // If the response is OK and valid JSON, we found it
