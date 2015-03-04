@@ -15,6 +15,7 @@ var mkdirp = require('mkdirp');
 // Some variables
 var dataSearchQueue = queue(5);
 var downloadQueue = queue(4);
+var requestTimeout = 120000;
 var update = (process.argv[2] === 'refresh');
 
 
@@ -35,7 +36,7 @@ mkdirp.sync(path.join(__dirname, 'data/csv'));
 if (!fs.existsSync(dotgovCSV) || update) {
   console.log('Downloading .gov CSV file ... ');
 
-  request(dotgovURL, function(error, response, body) {
+  request({ url: dotgovURL, timeout: RequestTimeout }, function(error, response, body) {
     if (!error && response.statusCode === 200) {
       fs.writeFileSync(dotgovCSV, body);
       lookDomains();
@@ -66,7 +67,6 @@ function lookDomains() {
       // Add some data
       rows = _.map(rows, function(r, ri) {
         r.id = r['Domain Name'].toLowerCase().replace(/\s/ig, '-');
-        r.path = path.join(__dirname, 'data/json/', r.id + '.data.json')
         return r;
       });
 
@@ -108,15 +108,17 @@ function getDataInventories() {
   // Download (if needed)
   console.log('Downloading data.json files if needed ... ');
   _.each(urls, function(u, ui) {
-    if (!fs.existsSync(u.path) || update) {
+    var localPath = path.join(__dirname, 'data/json/', u.id + '.data.json');
+
+    if (!fs.existsSync(localPath) || update) {
 
       // Queue up request
       downloadQueue.defer(function(done) {
         console.log('Downloading ' + u['Data URL'] + ' ... ');
 
-        request.get(u['Data URL'], function(error, response, body) {
+        request.get({ url: u['Data URL'], timeout: requestTimeout }, function(error, response, body) {
           if (!error && response.statusCode === 200) {
-            fs.writeFileSync(u.path, body);
+            fs.writeFileSync(localPath, body);
             done();
           }
           else {
@@ -145,7 +147,8 @@ function combineData() {
   var ids, output;
 
   if (fs.existsSync(combineDataJSON) && !update) {
-    console.log('All up to date.');
+    console.log('Combined file already created.');
+    createCSV();
     return;
   }
 
@@ -153,7 +156,8 @@ function combineData() {
 
   // Load files together
   urls = _.map(urls, function(u, ui) {
-    u.data = require(u.path);
+    var localPath = path.join(__dirname, 'data/json/', r.id + '.data.json');
+    u.data = require(localPath);
     return u;
   });
 
@@ -181,6 +185,33 @@ function combineData() {
   // Create output for project
   fs.writeFileSync(combineDataJSON, JSON.stringify(data));
   console.log('Combine data file saved. ');
+
+  createCSV();
+}
+
+
+// Create CSVs
+function createCSV() {
+  var urls = require(urlsJSON);
+
+  _.each(urls, function(u, ui) {
+    var data = require(u.path);
+    var localPath = path.join(__dirname, 'data/csv/', u.id + '.data.csv');
+    var output = ['agency', 'publisher', 'title', 'description'];
+
+    // Add datasets
+    _.each(data, function(d, di) {
+      output.push([
+        u['Federal Agency'],
+        d.publisher.name,
+        d.title,
+        d.description
+      ]);
+    });
+
+    // Output to file
+    fs.writeFileSync(path, csv.format(output));
+  });
 }
 
 
@@ -192,7 +223,7 @@ function checkDataURL(row, www, cb) {
       url = 'http://' + (www ? 'www.' : '') + domain + '/data.json';
 
   // Get the URL
-  request.get(url, function(err, res, body) {
+  request.get({ url: url, timeout: requestTimeout }, function(err, res, body) {
 
     var found = false;
 
