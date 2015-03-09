@@ -1,6 +1,6 @@
 # Project ignores
-data/json/*
-data/data-inventory.json
+data/agencies/*
+data/master-inventory.json
 
 
 # General git ignores
