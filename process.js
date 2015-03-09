@@ -108,7 +108,7 @@ function getDataInventories() {
   // Download (if needed)
   console.log('Downloading data.json files if needed ... ');
   _.each(urls, function(u, ui) {
-    var localPath = path.join(__dirname, 'data/json/', u.id + '.data.json');
+    var localPath = path.join(__dirname, 'data/agencies/', u.id + '.data.json');
 
     if (!fs.existsSync(localPath) || refresh) {
 
@@ -239,7 +239,7 @@ function checkDataURL(row, www, cb) {
     // Found, save locally
     if (found) {
       console.log('Data found at: ' + url);
-      fs.writeFileSync(path.join(__dirname, 'data/json/', row.id + '.data.json'),body);
+      fs.writeFileSync(path.join(__dirname, 'data/agencies/', row.id + '.data.json'),body);
       row['Data URL'] = url;
       cb(null, row);
       return;
