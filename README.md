@@ -1,27 +1,64 @@
 # Federal data inventory
 
-Government agencies have published `data.json` files at their top-level domains.  These files describe basics about datasets (or databases).  Up until early 2015, these were just datasets that were already provided publicly, but now this included information about databases that are not publicly available.
+Government agencies have starting publishing dataset "inventories," generally available as JSON files named `data.json` at agency domain roots (e.g. http://nsf.gov/data.json).
 
-This repo is both the data and a scraper to get the data.
+These files provide some basic information about datasets/databases the agency possesses, like the dataset name, how frequently it's updated, and whether it's public.
 
-## Data
+This repo consists of a scraper to get the data for yourself and includes some of the results, excluding large files.
 
-* List of `.gov` websites in CSV format [provided by 18F](https://18f.gsa.gov/2014/12/18/a-complete-list-of-gov-domains/): `data/dotgov.csv`.
-* List of `.gov` data inventories that were resolved when last run is saved as `data/data/data-inventories.json`
-    * Note that some domains are redirects, so some inventories are duplicated.
-    * Note that the DOI's file has had issues of not resolving, and it is a huge file.
-* Limited, combined, and de-dupped CSV of all data inventories: `data/data-inventory.csv`
-    * This only includes some of the metadata for the inventories but is a good place to look for datasets.
-* Complete, combined, and de-dupped JSON of all data inventories: `data/data-inventory.json`
-    * This file is not committed to this repository.
-* Each individual `XXX.gov/data.json` is provided in: `data/json`
-    * Note that some domains are redirects, so some inventories are duplicated.
-    * This file is not committed to this repository.
+## Install/run for the first time
 
-## Updating
+Make sure you have [NodeJS](http://nodejs.org/) installed.
 
-As this data can (and should) change, it will be good to update.
+Clone this repo, then install and run the scraper:
 
-* Make sure that you have [NodeJS](http://nodejs.org/) installed and do `npm install` to get dependencies.
-* The following will update what has not been processed yet: `node process.js`
-* To force a refresh and overwrite data do the following (this will take some time): `node process refresh`
+```
+$ git clone https://github.com/datanews/data-inventories.git
+$ cd data-inventories
+$ npm install
+$ node process.js
+```
+
+This scraper will do the following:
+
+1. Go through all the federal .gov domains in the CSV [provided by 18F](https://18f.gsa.gov/2014/12/18/a-complete-list-of-gov-domains/) and look for ones with a `/data.json`.  The list of inventories found will be saved as `data/data-inventory-list.json`.
+2. Download all those `data.json` files into the `data/json/` directory (e.g. `data/json/nsf.gov.json`).
+
+Note that some `data.json` files are duplicates.  For example, the Consumer Financial Protection Bureau currently posts its data inventory in at least nine places:
+
+```
+http://consumerprotection.gov/data.json
+http://consumerprotectionbureau.gov/data.json
+http://consumerfinancialbureau.gov/data.json
+http://consumerfinancial.gov/data.json
+http://consumerfinance.gov/data.json
+http://consumerbureau.gov/data.json
+http://cfpb.gov/data.json
+http://cfpa.gov/data.json
+http://bcfp.gov/data.json
+```
+
+Also, some `data.json` files might just be random junk and not a dataset inventory, like what's currently at `http://census.gov/data.json`.
+
+3. Create `data/data-inventory.csv`, a single combined CSV file with all of the datasets across all the inventories, de-duped.  It only includes a few fields, but it's a good starting point to browse for datasets.
+4. Create `data/data-inventory.json`, a single combined JSON file with all of the datasets across all the inventories, de-duped.  This is a big file so it's not committed to the repo.  You'll have to run the scraper yourself to generate it.
+
+## Refresh EVERYTHING
+
+By default, the scraper will use any existing generated files, like the list of .gov domains.  If you want it to fetch everything from scratch (much slower), add the `refresh` parameter:
+
+```
+$ node process.js refresh
+```
+
+## Credits/License
+
+By [Alan Palazzolo](https://github.com/zzolo)
+
+Available under the MIT license.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions.
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

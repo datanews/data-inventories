@@ -16,30 +16,30 @@ var mkdirp = require('mkdirp');
 var dataSearchQueue = queue(5);
 var downloadQueue = queue(4);
 var requestTimeout = 120000;
-var update = (process.argv[2] === 'refresh');
+var refresh = (process.argv[2] === 'refresh');
 
 
 // Inputs and outputs
 var dotgovURL = 'https://gsa.github.io/data/dotgov-domains/2014-12-01-full.csv';
 var dotgovCSV = path.join(__dirname, 'data/dotgov.csv');
-var urlsJSON = path.join(__dirname, 'data/data-inventories.json');
-var combineDataJSON = path.join(__dirname, 'data/data-inventory.json');
-var combineDataCSV = path.join(__dirname, 'data/data-inventory.csv');
+var urlsJSON = path.join(__dirname, 'data/inventory-list.json');
+var combineDataJSON = path.join(__dirname, 'data/master-inventory.json');
+var combineDataCSV = path.join(__dirname, 'data/master-inventory.csv');
 
 
 // Ensure we have directories
 mkdirp.sync(path.join(__dirname, 'data'));
-mkdirp.sync(path.join(__dirname, 'data/json'));
+mkdirp.sync(path.join(__dirname, 'data/agencies'));
 
 
 // Get CSV of dotgov if needed
-if (!fs.existsSync(dotgovCSV) || update) {
+if (!fs.existsSync(dotgovCSV) || refresh) {
   console.log('Downloading .gov CSV file ... ');
 
   request({ url: dotgovURL, timeout: RequestTimeout }, function(error, response, body) {
     if (!error && response.statusCode === 200) {
       fs.writeFileSync(dotgovCSV, body);
-      lookDomains();
+      checkDomains();
     }
     else {
       console.error('Error getting .gov CSV file.', error, u);
@@ -48,13 +48,13 @@ if (!fs.existsSync(dotgovCSV) || update) {
 }
 else {
   console.log('Found existing .gov CSV file ... ');
-  lookDomains();
+  checkDomains();
 }
 
 
 // Look up each domain to see if data.json exists
-function lookDomains() {
-  if (!fs.existsSync(urlsJSON) || update) {
+function checkDomains() {
+  if (!fs.existsSync(urlsJSON) || refresh) {
 
     fs.readFile(dotgovCSV, 'utf8', function(err, rawCSV) {
       var rows = csv.parse(rawCSV);
@@ -103,14 +103,14 @@ function lookDomains() {
 
 // Get actual data inventories data
 function getDataInventories() {
-  var urls = require(urlsJSON);
+  var urls = readJSON(urlsJSON);
 
   // Download (if needed)
   console.log('Downloading data.json files if needed ... ');
   _.each(urls, function(u, ui) {
     var localPath = path.join(__dirname, 'data/json/', u.id + '.data.json');
 
-    if (!fs.existsSync(localPath) || update) {
+    if (!fs.existsSync(localPath) || refresh) {
 
       // Queue up request
       downloadQueue.defer(function(done) {
@@ -143,12 +143,12 @@ function getDataInventories() {
 
 // Combine all data.
 function combineData() {
-  var urls = require(urlsJSON);
+  var urls = readJSON(urlsJSON);
   var data = [];
   var ids, output;
   var combinedCSV = [ ['agency', 'publisher', 'title', 'description', 'access'] ];
 
-  if (fs.existsSync(combineDataJSON) && fs.existsSync(combineDataCSV) && !update) {
+  if (fs.existsSync(combineDataJSON) && fs.existsSync(combineDataCSV) && !refresh) {
     console.log('Combined files already created.');
     return;
   }
@@ -157,9 +157,9 @@ function combineData() {
 
   // Load files together
   urls = _.map(urls, function(u, ui) {
-    var localPath = path.join(__dirname, 'data/json/', u.id + '.data.json');
+    var localPath = path.join(__dirname, 'data/agencies/', u.id + '.data.json');
     if (fs.existsSync(localPath)) {
-      u.data = require(localPath);
+      u.data = readJSON(localPath);
     }
     return u;
   });
@@ -218,7 +218,6 @@ function combineData() {
   console.log('Combine data files saved. ');
 }
 
-
 // Try to get data.json for a domain, with optional www.
 function checkDataURL(row, www, cb) {
   // Construct data.json URL
@@ -240,7 +239,7 @@ function checkDataURL(row, www, cb) {
     // Found, save locally
     if (found) {
       console.log('Data found at: ' + url);
-      fs.writeFileSync(row.path);
+      fs.writeFileSync(path.join(__dirname, 'data/json/', row.id + '.data.json'),body);
       row['Data URL'] = url;
       cb(null, row);
       return;
@@ -255,4 +254,9 @@ function checkDataURL(row, www, cb) {
     // Give up
     cb(null, row);
   });
+}
+
+// Not using require() for older Node support
+function readJSON(filename) {
+  return JSON.parse(fs.readFileSync(filename,{encoding:"utf8"}));
 }
