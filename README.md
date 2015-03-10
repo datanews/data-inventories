@@ -22,7 +22,7 @@ $ node process.js
 This scraper will do the following:
 
 1. Go through all the federal .gov domains in the CSV [provided by 18F](https://18f.gsa.gov/2014/12/18/a-complete-list-of-gov-domains/) and look for ones with a `/data.json`.  The list of inventories found will be saved as `data/inventory-list.json`.
-2. Download all those `data.json` files into the `data/json/` directory (e.g. `data/json/nsf.gov.json`).
+2. Download all those `data.json` files into the `data/agencies/` directory (e.g. `data/agencies/nsf.gov.data.json`).
 
 Note that some `data.json` files are duplicates.  For example, the Consumer Financial Protection Bureau currently posts its data inventory in at least nine places:
 
