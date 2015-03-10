@@ -256,7 +256,8 @@ function checkDataURL(row, www, cb) {
   });
 }
 
-// Not using require() for older Node support
+// Should use JSON.parse for older Node support...
+// but \r\n and control characters throw errors
 function readJSON(filename) {
-  return JSON.parse(fs.readFileSync(filename,{encoding:"utf8"}));
+  return require(filename);
 }
