@@ -53,7 +53,7 @@ $ node process.js refresh
 
 ## Credits/License
 
-By [Alan Palazzolo](https://github.com/zzolo)
+By [Alan Palazzolo](https://github.com/zzolo) and [Noah Veltman](https://github.com/veltman)
 
 Available under the MIT license.
 

@@ -149,7 +149,7 @@ function combineData() {
   var combinedCSV = [ ['agency', 'publisher', 'title', 'description', 'access'] ];
 
   if (fs.existsSync(combineDataJSON) && fs.existsSync(combineDataCSV) && !refresh) {
-    console.log('Combined files already created.');
+    console.log('Master files already created.');
     return;
   }
 
@@ -215,7 +215,7 @@ function combineData() {
   fs.writeFileSync(combineDataCSV, csv.format(combinedCSV));
 
   // Create
-  console.log('Combine data files saved. ');
+  console.log('Master data files saved. ');
 }
 
 // Try to get data.json for a domain, with optional www.
