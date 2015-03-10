@@ -36,7 +36,7 @@ mkdirp.sync(path.join(__dirname, 'data/agencies'));
 if (!fs.existsSync(dotgovCSV) || refresh) {
   console.log('Downloading .gov CSV file ... ');
 
-  request({ url: dotgovURL, timeout: RequestTimeout }, function(error, response, body) {
+  request({ url: dotgovURL, timeout: requestTimeout }, function(error, response, body) {
     if (!error && response.statusCode === 200) {
       fs.writeFileSync(dotgovCSV, body);
       checkDomains();
@@ -71,7 +71,7 @@ function checkDomains() {
       });
 
       // Could be a while
-      console.log('Looking for data.json on ' + rows.length + ' .gov domains (this could take awhile and might output some warnings) ... ');
+      console.log('Looking for data.json on ' + rows.length + ' .gov domains (this could take a long time and might output some warnings) ... ');
 
       // Defer task for every domain in CSV
       // This gives off some errors for some reason:
