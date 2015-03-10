@@ -21,8 +21,8 @@ $ node process.js
 
 This scraper will do the following:
 
-1. Go through all the federal .gov domains in the CSV [provided by 18F](https://18f.gsa.gov/2014/12/18/a-complete-list-of-gov-domains/) and look for ones with a `/data.json`.  The list of inventories found will be saved as `data/inventory-list.json`.
-2. Download all those `data.json` files into the `data/agencies/` directory (e.g. `data/agencies/nsf.gov.data.json`).
+* Go through all the federal .gov domains in the CSV [provided by 18F](https://18f.gsa.gov/2014/12/18/a-complete-list-of-gov-domains/) and look for ones with a `/data.json`.  The list of inventories found will be saved as `data/inventory-list.json`.
+* Download all those `data.json` files into the `data/agencies/` directory (e.g. `data/agencies/nsf.gov.data.json`).
 
 Note that some `data.json` files are duplicates.  For example, the Consumer Financial Protection Bureau currently posts its data inventory in at least nine places:
 
@@ -40,8 +40,8 @@ http://bcfp.gov/data.json
 
 Also, some `data.json` files might just be random junk and not a dataset inventory, like what's currently at `http://census.gov/data.json`.
 
-3. Create `data/data-inventory.csv`, a single combined CSV file with all of the datasets across all the inventories, de-duped.  It only includes a few fields, but it's a good starting point to browse for datasets.
-4. Create `data/data-inventory.json`, a single combined JSON file with all of the datasets across all the inventories, de-duped.  This is a big file so it's not committed to the repo.  You'll have to run the scraper yourself to generate it.
+* Create `data/master-inventory.csv`, a single combined CSV file with all of the datasets across all the inventories, de-duped.  It only includes a few fields, but it's a good starting point to browse for datasets.
+* Create `data/master-inventory.json`, a single combined JSON file with all of the datasets across all the inventories, de-duped.  This is a big file so it's not committed to the repo.  You'll have to run the scraper yourself to generate it.
 
 ## Refresh EVERYTHING
 
